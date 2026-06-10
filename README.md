@@ -31,15 +31,22 @@
 # 无参数运行进入交互式菜单
 ./install.sh
 
-# 安装
+# 安装（旧版命令，兼容保留）
 ./install.sh all          # 安装到所有 AI 扩展
 ./install.sh roocode      # 安装到 RooCode    (~/.roo/skills/)
 ./install.sh claude       # 安装到 Claude Code (~/.claude/skills/)
 ./install.sh codebuddy    # 安装到 CodeBuddy  (~/.codebuddy/skills/)
 ./install.sh opencode     # 安装到 OpenCode    (~/.config/opencode/skills/)
 
+# 安装（新版命令）
+./install.sh install roocode           # 安装到 RooCode
+./install.sh install all force         # 强制覆盖安装到所有工具
+
 # 查看与卸载
-./install.sh status       # 显示安装状态
-./install.sh uninstall    # 卸载所有已安装的技能
-./install.sh help         # 显示帮助信息
+./install.sh status                    # 显示安装状态
+./install.sh list                      # 列出所有已安装的技能
+./install.sh list claude               # 列出 Claude Code 的技能
+./install.sh uninstall                 # 卸载所有已安装的技能（兼容旧版）
+./install.sh remove all                # 卸载所有工具的技能（新版）
+./install.sh help                      # 显示帮助信息
 ```
