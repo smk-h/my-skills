@@ -95,7 +95,143 @@ switch (variable) {
 
 - 宏定义、函数声明集中放在头文件或文件头；全局变量定义和声明只能放在文件头。
 - 文件内顺序：包含的头文件、局部变量定义、全局变量定义、全局变量声明、内部函数声明、外部函数声明。
+- 引用多个头文件时，尖括号（`<>`）引用的系统/库头文件在前，双引号（`""`）引用的项目头文件在后。
 - 函数内部变量定义集中放在函数开始处，禁止在函数执行语句中随处定义或声明。
+
+## 编码安全规范
+
+### 1. 变量初始化规范
+
+- 局部变量在定义时必须赋初始值，禁止定义未初始化的变量。
+
+【**正确示例**】
+
+```c
+int fd = -1;
+char *buf = NULL;
+int ret = 0;
+```
+
+【**错误示例**】
+
+```c
+int fd;                        /* 禁止：未初始化 */
+char *buf;                     /* 禁止：未初始化 */
+```
+
+### 2. 返回值检查规范
+
+- 调用有返回值的函数时，必须使用变量接收返回值，禁止直接丢弃函数返回值。
+- 接收返回值后必须对其进行检查，后续逻辑仅在检查通过后执行。
+
+【**正确示例**】
+
+```c
+int ret = read_file(fd, buf, size);
+if (ret < 0) {
+    /* 错误处理 */
+    return -1;
+}
+/* 正常逻辑 */
+```
+
+【**错误示例**】
+
+```c
+read_file(fd, buf, size);      /* 禁止：未接收返回值 */
+```
+
+### 3. 内存管理规范
+
+- 使用 `malloc`、`calloc`、`realloc` 申请内存后，必须检查返回值是否为 `NULL`，禁止不经检查直接使用。
+- 动态分配的内存在不再使用时，必须调用 `free` 释放，防止内存泄漏。
+
+【**正确示例**】
+
+```c
+char *buf = (char *)malloc(1024);
+if (buf == NULL) {
+    /* 内存分配失败处理 */
+    return -1;
+}
+/* 使用 buf */
+free(buf);
+buf = NULL;
+```
+
+【**错误示例**】
+
+```c
+char *buf = (char *)malloc(1024);
+/* 禁止：未检查 buf 是否为 NULL 就直接使用 */
+memset(buf, 0, 1024);
+/* 禁止：使用完毕后未调用 free 释放内存 */
+```
+
+### 4. 函数编写规范
+
+#### 4.1 参数检查
+
+- 若参数中包含指针，必须在函数入口处检查指针是否为 `NULL`，禁止不经检查直接解引用。
+
+【**正确示例**】
+
+```c
+int process_data(const char *buf, int len) {
+    if (buf == NULL) {
+        return -1;
+    }
+    /* 正常处理逻辑 */
+    return 0;
+}
+```
+
+【**错误示例**】
+
+```c
+int process_data(const char *buf, int len) {
+    /* 禁止：未检查 buf 是否为 NULL 就直接使用 */
+    memcpy(dest, buf, len);
+    return 0;
+}
+```
+
+#### 4.2 主函数版本信息
+
+- `main` 函数中**必须**打印程序版本信息，便于问题追踪和版本确认。
+- 版本信息宏（如 `GIT_VERSION`、`GIT_PATH`）由 Makefile 通过 `-D` 选项注入，C 代码中必须使用 `#ifndef` 提供 `"unknown"` 兜底定义，确保无 Makefile 时仍可编译。
+- 版本信息应在程序启动后、业务逻辑之前打印，格式为单行输出：`** [函数名:行号][Build Info] 日期 时间, git: 版本, path: 路径 **`，使用 `__func__`、`__LINE__`、`__DATE__`、`__TIME__` 预定义宏。
+
+【**正确示例**】
+
+```c
+#ifndef GIT_VERSION
+#define GIT_VERSION "unknown"
+#endif
+
+#ifndef GIT_PATH
+#define GIT_PATH "unknown"
+#endif
+
+int main(void) {
+    /* 打印版本信息 */
+    printf("** [%s:%d][Build Info] %s %s, git: %s, path: %s **\n",
+           __func__, __LINE__, __DATE__, __TIME__, GIT_VERSION, GIT_PATH);
+
+    /* 业务逻辑 */
+    ...
+}
+```
+
+【**错误示例**】
+
+```c
+/* 禁止：直接使用宏而不提供兜底定义，无 Makefile 时编译报错 */
+int main(void) {
+    printf("Version: %s\n", GIT_VERSION);
+    ...
+}
+```
 
 ## 注释规范
 
@@ -236,3 +372,4 @@ extern "C" {
 2. 为文件添加标准文件头注释。
 3. 为公共函数添加 doxygen 风格函数头注释。
 4. 确保命名符合规范要求。
+5. `main` 函数中必须包含版本信息打印逻辑，使用 `#ifndef` 为 `GIT_VERSION`、`GIT_PATH` 等宏提供兜底定义。
