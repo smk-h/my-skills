@@ -50,3 +50,38 @@
 ./install.sh remove all                # 卸载所有工具的技能（新版）
 ./install.sh help                      # 显示帮助信息
 ```
+
+## 三、 使用 npx skills add 安装
+
+通过 [skills CLI](https://github.com/vercel-labs/skills) 可一键将本仓库的技能安装到 OpenCode、Claude Code 等 AI 编程工具：
+
+```bash
+# 全局安装所有 skills
+npx skills add https://cnb.cool/smk.h/my-skills.git -g
+
+# 全局安装到指定工具
+npx skills add https://cnb.cool/smk.h/my-skills.git -g -a opencode
+npx skills add https://cnb.cool/smk.h/my-skills.git -g -a claude-code
+npx skills add https://cnb.cool/smk.h/my-skills.git -g -a opencode -a claude-code -a roo
+
+# 安装指定 skill（全局）
+npx skills add https://cnb.cool/smk.h/my-skills.git -g --skill markdowncli
+
+# 预览可安装的 skills 列表
+npx skills add https://cnb.cool/smk.h/my-skills.git --list
+
+# 一键安装全部 skills 到全部工具（无交互）
+npx skills add https://cnb.cool/smk.h/my-skills.git -g --all
+```
+
+| 选项 | 说明 |
+| ---- | ---- |
+| `-g, --global` | 安装到用户全局目录（`~/`），而非当前项目目录 |
+| `-a, --agent` | 指定目标工具（`opencode`、`claude-code`、`roo` 等） |
+| `-s, --skill` | 指定安装特定 skill，`'*'` 表示全部 |
+| `--all` | 安装全部 skills 到全部已检测到的工具 |
+| `-y, --yes` | 跳过确认提示，直接安装 |
+
+---
+*本文档由 markdowncli 技能辅助生成*
+```
