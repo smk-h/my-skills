@@ -247,9 +247,14 @@ function processValue(value: string | number): void {
 
 ### 3. 函数与类注释
 
-函数和公共方法头部应进行 JSDoc 风格注释，包含 `@param`、`@returns`、`@throws` 等标签。
+**函数注释（强制）**
 
-【**推荐格式**】
+每个函数必须添加 JSDoc 风格注释，包含 `@param`、`@returns`、`@throws` 等标签。函数内部关键逻辑处必须添加合理的注释，说明非显而易见的处理意图。
+
+- 函数头注释：描述函数功能、每个参数的含义、返回值、可能抛出的异常。
+- 函数内注释：在复杂算法、分支逻辑、特殊处理、边界条件等处添加注释，说明"为什么"而非"做什么"。
+
+【**正确示例**】
 
 ```typescript
 /**
@@ -260,22 +265,55 @@ function processValue(value: string | number): void {
  * @throws {TypeError} 当传入非数字时抛出
  */
 function add(a: number, b: number): number {
+  // 类型检查，防止非预期输入
   if (typeof a !== 'number' || typeof b !== 'number') {
     throw new TypeError('Parameters must be numbers');
   }
+  // 直接返回计算结果
   return a + b;
+}
+```
+
+**类注释（强制）**
+
+每个类声明必须添加 JSDoc 风格注释，说明类的职责与用途。类内部的每个方法也必须有 JSDoc 注释。
+
+```typescript
+/**
+ * 用户服务类，负责用户的增删改查与权限校验
+ */
+class UserService {
+  /**
+   * 根据用户 ID 获取用户信息
+   * @param id - 用户唯一标识
+   * @returns 用户对象，不存在时返回 undefined
+   */
+  public getUser(id: string): User | undefined {
+    // 从缓存中查找，减少数据库查询
+    return this.cache.get(id) as User | undefined;
+  }
 }
 ```
 
 ### 4. 接口与类型注释
 
-接口和类型别名应添加简要注释说明其用途。成员注释使用双斜杠 `//`，紧跟在成员后面，不要另起一行。
+**接口与类型别名（强制）**
+
+每个接口和类型别名声明必须添加 JSDoc 风格注释，说明其用途与职责。成员注释使用双斜杠 `//`，紧跟在成员后面，不要另起一行。
 
 ```typescript
+/** 用户实体接口 */
 interface User {
   id: string;   // 用户唯一标识
   name: string; // 用户显示名称
 }
+
+/** 创建用户请求参数 */
+type CreateUserRequest = {
+  name: string;
+  email: string;
+  role?: string; // 角色可选
+};
 ```
 
 ## 导入导出规范
@@ -325,6 +363,9 @@ import { localUtil } from './localUtil';
 【**正确示例**】
 
 ```typescript
+/**
+ * 用户服务类，管理用户数据与缓存
+ */
 class UserService {
   public readonly name: string;
   protected cache: Map<string, unknown>;
@@ -336,10 +377,19 @@ class UserService {
     this.cache = new Map();
   }
 
+  /**
+   * 获取用户信息
+   * @param id - 用户唯一标识
+   * @returns 用户对象，可能为 undefined
+   */
   public getUser(id: string): User | undefined {
     return this.cache.get(id) as User | undefined;
   }
 
+  /**
+   * 校验内部密钥有效性
+   * @returns 密钥有效返回 true
+   */
   private _validate(): boolean {
     return !!this._secret;
   }
@@ -434,7 +484,8 @@ function validateInput(input: string): void {
 
 1. 优先应用本规范的所有格式要求。
 2. 为文件添加标准文件头注释。
-3. 为公共函数和类添加 JSDoc 风格注释。
-4. 确保命名符合规范要求。
-5. 避免使用 `any`，使用严格的类型声明。
-6. 使用 `async/await` 处理异步操作。
+3. 为**每个函数**添加 JSDoc 风格注释（`@param`、`@returns`、`@throws`），函数内部关键逻辑添加注释。
+4. 为**每个类**添加 JSDoc 风格注释，类内每个方法也须添加 JSDoc 注释。
+5. 确保命名符合规范要求。
+6. 避免使用 `any`，使用严格的类型声明。
+7. 使用 `async/await` 处理异步操作。
