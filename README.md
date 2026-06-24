@@ -7,6 +7,7 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 | 技能 | 说明 |
 |:------|:------|
 | [c-lang-spec](./skills/c-lang-spec/SKILL.md) | C 语言编程规范的代码检查与格式化指导 |
+| [code-spec](./skills/code-spec/SKILL.md) | Spec 驱动开发：依次生成 spec/plan/task/checklist 四份文档，指导开发与验收 |
 | [makefile-spec](./skills/makefile-spec/SKILL.md) | Makefile 编写规范的代码检查、格式化与编写指导 |
 | [markdowncli](./skills/markdowncli/SKILL.md) | 按指定规范创建或者修改 markdown 文件 |
 | [ts-lang-spec](./skills/ts-lang-spec/SKILL.md) | TypeScript 语言编程规范的代码检查与格式化指导 |
