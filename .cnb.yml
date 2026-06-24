@@ -14,7 +14,7 @@ main:
             auth_type: https
             username: sumumm
             password: ${GITHUB_CNB_SYNC}
-            # force: true
+            force: true
 
 $:
   vscode:
