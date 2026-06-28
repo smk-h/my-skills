@@ -16,7 +16,57 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 
 ## 二、安装skills
 
-### 1. Windows
+skills 支持两种安装方式：
+
+| 方式 | 脚本 | 特点 |
+|:------|:-----|:-----|
+| **软链接（推荐）** | `linux-skills.sh` / `windows-skills.ps1` | skills 只存一份，各工具通过链接共享，改仓库即全员生效 |
+| 拷贝（传统） | `install.sh` / `install.ps1` | 每个工具各存一份独立拷贝 |
+
+### 1. 软链接安装（推荐）
+
+软链接方案通过 `~/.smskills` 本地镜像层，解耦仓库路径与 agent 链接：
+
+```
+仓库 skills/  ──[update]──▶  ~/.smskills/  ──[link]──▶  各 agent 工具
+```
+
+仓库挪动后只需重新 `update`，agent 链接不会断。
+
+**Windows**（使用 `windows-skills.ps1`，通过 Junction，无需管理员权限）：
+
+```powershell
+./windows-skills.ps1 -install         # 首次安装：镜像 + 全员链接
+./windows-skills.ps1 -update          # 仓库改动后刷新本地镜像（agent 即时生效）
+./windows-skills.ps1 -status          # 查看链接矩阵
+./windows-skills.ps1 -link claude     # 仅链接 Claude Code
+./windows-skills.ps1 -unlink roo      # 删除 RooCode 的链接（仅删链接，源不动）
+```
+
+**Linux / macOS**（使用 `linux-skills.sh`，通过符号链接 `ln -s`）：
+
+```bash
+./linux-skills.sh install             # 首次安装：镜像 + 全员链接
+./linux-skills.sh update              # 仓库改动后刷新本地镜像
+./linux-skills.sh status              # 查看链接矩阵
+./linux-skills.sh link claude         # 仅链接 Claude Code
+./linux-skills.sh unlink roo          # 删除 RooCode 的链接
+```
+
+| 命令 | 作用 |
+|:-----|:-----|
+| `install` / `-install` | 一键安装：`update` + `link all` |
+| `update` / `-update` | 把仓库 `skills/` 镜像覆盖到 `~/.smskills`（含孤儿清理） |
+| `link [tool] [force]` | 把 `~/.smskills/<skill>` 链接到各 agent 工具 |
+| `unlink [tool]` | 删除工具的链接（仅删链接，`~/.smskills` 源不动） |
+| `list` / `-l` | 列出已安装 skills（带 link/copy 标记） |
+| `status` / `-status` | 显示链接状态矩阵 |
+
+> 支持的 agent 工具：`claude`、`roo`、`zcode`、`opencode`。
+
+### 2. 拷贝安装（传统）
+
+### 2.1 Windows
 
 使用 `install.ps1` 管理 skills 的安装、删除和列表：
 
@@ -39,7 +89,7 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 
 > **注意**：`install.ps1` 含中文注释，PowerShell 5.1 需要 UTF-8 BOM 才能正确解析。如果脚本被其他编辑器重新保存，请确保保留 UTF-8 BOM 编码（文件开头 3 字节 `EF BB BF`）。
 
-### 2. Linux / macOS
+### 2.2 Linux / macOS
 
 使用 `install.sh` 管理 skills 的安装、卸载和状态查看：
 
@@ -98,6 +148,22 @@ npx skills add https://cnb.cool/smk.h/my-skills.git -g --all
 | `--all` | 安装全部 skills 到全部已检测到的工具 |
 | `-y, --yes` | 跳过确认提示，直接安装 |
 
+## 三、测试
+
+`test/` 目录提供安装脚本的端到端测试，覆盖全部命令并校验安全性不变量（仓库源全程不被破坏、mirror 不被误删）。技能数量动态扫描，增删 skill 无需改测试代码。
+
+```powershell
+# Windows：测试 windows-skills.ps1
+./test/test-windows-skills.ps1
+
+# Windows：测试 linux-skills.sh（通过 docker + ubuntu:22.04，无需 Git Bash）
+./test/test-linux-skills.ps1
+```
+
+```bash
+# Linux / macOS：直接测试 linux-skills.sh
+./test/test-linux-skills.sh
+```
+
 ---
 *本文档由 markdowncli 技能辅助生成*
-```
