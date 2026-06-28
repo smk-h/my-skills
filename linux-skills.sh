@@ -52,11 +52,10 @@ TOOLS[claude]="${HOME}/.claude/skills|Claude Code"
 TOOLS[roo]="${HOME}/.roo/skills|RooCode"
 TOOLS[zcode]="${HOME}/.zcode/skills|ZCode"
 TOOLS[opencode]="${HOME}/.config/opencode/skills|OpenCode"
-# 如需 CodeBuddy，取消下一行注释：
-# TOOLS[codebuddy]="${HOME}/.codebuddy/skills|CodeBuddy"
+TOOLS[codebuddy]="${HOME}/.codebuddy/skills|CodeBuddy"
 
 # 工具标识顺序
-TOOL_KEYS=("claude" "roo" "zcode" "opencode")
+TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy")
 
 # 查表
 get_tool_path() { local e="${TOOLS[$1]}"; echo "${e%%|*}"; }

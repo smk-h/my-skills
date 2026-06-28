@@ -35,11 +35,11 @@ param(
     [switch]$update,
     [switch]$install,
     [switch]$f,
-    [ValidateSet("claude", "roo", "zcode", "opencode", "all")]
+    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "all")]
     [string]$d,
-    [ValidateSet("claude", "roo", "zcode", "opencode", "all")]
+    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "all")]
     [string]$unlink,
-    [ValidateSet("claude", "roo", "zcode", "opencode", "all")]
+    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "all")]
     [string]$link
 )
 
@@ -60,11 +60,11 @@ $script:mirrorPath = Join-Path $env:USERPROFILE ".smskills"
 
 # Tool table: key -> @{ Path=install dir; Name=display name }
 $script:tools = [ordered]@{
-    claude   = @{ Path = Join-Path $env:USERPROFILE ".claude\skills";            Name = "Claude Code" }
-    roo      = @{ Path = Join-Path $env:USERPROFILE ".roo\skills";               Name = "RooCode" }
-    zcode    = @{ Path = Join-Path $env:USERPROFILE ".zcode\skills";             Name = "ZCode" }
-    opencode = @{ Path = Join-Path $env:USERPROFILE ".config\opencode\skills";   Name = "OpenCode" }
-    # codebuddy = @{ Path = Join-Path $env:USERPROFILE ".codebuddy\skills";       Name = "CodeBuddy" }
+    claude    = @{ Path = Join-Path $env:USERPROFILE ".claude\skills";            Name = "Claude Code" }
+    roo       = @{ Path = Join-Path $env:USERPROFILE ".roo\skills";               Name = "RooCode" }
+    zcode     = @{ Path = Join-Path $env:USERPROFILE ".zcode\skills";             Name = "ZCode" }
+    opencode  = @{ Path = Join-Path $env:USERPROFILE ".config\opencode\skills";   Name = "OpenCode" }
+    codebuddy = @{ Path = Join-Path $env:USERPROFILE ".codebuddy\skills";         Name = "CodeBuddy" }
 }
 
 # ========================================================
@@ -407,7 +407,7 @@ function Show-Help {
     Write-Host "    -unlink <tool>    Remove junctions from a tool (link only, source safe)"
     Write-Host "    -d      <tool>    Alias of -unlink"
     Write-Host ""
-    Write-Host "  Tools: claude, roo, zcode, opencode, all"
+    Write-Host "  Tools: claude, roo, zcode, opencode, codebuddy, all"
     Write-Host ""
     Write-Host "  Examples:" -ForegroundColor White
     Write-Host "    ./windows-skills.ps1 -install         # first setup: mirror + link all"
