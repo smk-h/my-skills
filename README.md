@@ -12,6 +12,7 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 | [markdowncli](./skills/markdowncli/SKILL.md) | 按指定规范创建或者修改 markdown 文件 |
 | [ts-lang-spec](./skills/ts-lang-spec/SKILL.md) | TypeScript 语言编程规范的代码检查与格式化指导 |
 | [git-commit-spec](./skills/git-commit-spec/SKILL.md) | Git 提交规范的检查、格式化与编写指导，基于 Conventional Commits 规范 |
+| [windows-disk-analysis](./skills/windows-disk-analysis/SKILL.md) | 分析 Windows 磁盘空间占用，定位大文件与大目录，标记可安全清理项并生成报告 |
 
 
 ## 二、安装skills
