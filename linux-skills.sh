@@ -53,9 +53,10 @@ TOOLS[roo]="${HOME}/.roo/skills|RooCode"
 TOOLS[zcode]="${HOME}/.zcode/skills|ZCode"
 TOOLS[opencode]="${HOME}/.config/opencode/skills|OpenCode"
 TOOLS[codebuddy]="${HOME}/.codebuddy/skills|CodeBuddy"
+TOOLS[codex]="${HOME}/.codex/skills|Codex"
 
 # 工具标识顺序
-TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy")
+TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy" "codex")
 
 # 查表
 get_tool_path() { local e="${TOOLS[$1]}"; echo "${e%%|*}"; }
