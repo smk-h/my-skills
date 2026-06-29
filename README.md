@@ -63,7 +63,7 @@ skills 支持两种安装方式：
 | `list` / `-l` | 列出已安装 skills（带 link/copy 标记） |
 | `status` / `-status` | 显示链接状态矩阵 |
 
-> 支持的 agent 工具：`claude`、`roo`、`zcode`、`opencode`、`codebuddy`。
+> 支持的 agent 工具：`claude`、`roo`、`zcode`、`opencode`、`codebuddy`、`codex`。
 
 ### 2. 拷贝安装（传统）
 
