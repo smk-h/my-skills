@@ -28,6 +28,55 @@ description: Git 提交规范的检查、格式化与编写指导，基于 Conve
 - "帮我格式化这个 commit message"
 - "按规范整理这个提交信息"
 
+<GATE>
+执行 `git commit` / `git push` 之前，必须将完整的提交信息展示给用户并等待明确确认。无论提交多简单，一律先展示再执行。
+</GATE>
+
+## 禁止事项
+
+1. **【最高优先级】禁止未经用户确认直接执行 `git commit` 或 `git push`**。生成提交信息后必须先展示给用户，经用户明确确认（「确认 / ok / 同意」）后方可执行。其余禁止事项均次于本条。
+2. **禁止使用无意义的提交信息**，如 `update`、`fix bug`、`wip`、`misc` 等。
+3. **禁止在描述中使用过去时**，应使用祈使句（如 "add" 而非 "added" 或 "adds"）。
+4. **禁止在描述末尾加句号**。
+5. **禁止在类型或范围中使用中文**。
+6. **禁止遗漏破坏性变更声明**，凡涉及 API 不兼容变更的提交必须声明 `BREAKING CHANGE` 或使用 `!` 标记。
+7. **禁止在一个提交中混合多个不相关的变更**，应拆分为多个独立提交。
+8. **禁止 `BREAKING CHANGE` 使用小写**，必须全大写。
+
+## 行为规范
+
+### 提交信息检查
+
+当用户要求检查提交信息规范性时：
+
+1. 逐一对照本规范进行检查。
+2. 重点检查：类型是否合法、描述是否超长、是否使用祈使句、破坏性变更是否声明、中文格式是否正确。
+3. 指出不符合规范的具体位置和原因。
+4. 提供修改后的完整提交信息。
+
+### 提交信息编写
+
+当用户要求编写提交信息时：
+
+1. 分析本次代码变更的内容和范围。
+2. 选择最合适的 type 和 scope，按 `<type>[(scope)][!]: <description>` 格式撰写首行（type/scope 定义见下方「提交信息格式」）。确保描述不超过 72 字符，使用祈使句，破坏性变更必须声明。
+3. 如有需要，补充正文和页脚。
+4. **【硬节点】将完整的提交信息展示给用户，等待明确确认：**
+   - 用户确认（「确认 / ok / 同意」）→ 执行 `git commit`
+   - 用户要求修改 → 调整后重新回到第 4 步展示
+   - **绝不在第 4 步通过之前执行 `git commit` 或 `git push`**
+
+### 提交信息格式化
+
+当用户要求格式化现有提交信息时：
+
+1. 保留原意，调整格式使其符合规范。
+2. 补充缺失的 type 或 scope。
+3. 修正时态、去除句号。
+4. 超长描述进行精简或移入正文部分。
+
+---
+
 ## 提交信息格式
 
 ### 1. 基本结构
@@ -216,7 +265,7 @@ BREAKING CHANGE: the old `/auth` endpoint has been removed.
 Use `/auth/token` instead. Pass the JWT token in the Authorization header.
 ```
 
-【**错误示例**]
+【**错误示例**】
 
 ```
 BREAKING CHANGE: API changed    # 描述过于简略，缺乏迁移指引
@@ -328,19 +377,7 @@ Refs: #42
 fix(parser): handle empty array in JSON parsing
 ```
 
-### 3. 重构代码
-
-```
-refactor(logger): decouple log output from formatting logic
-```
-
-### 4. 性能优化
-
-```
-perf(search): reduce index lookup time with caching
-```
-
-### 5. 破坏性变更
+### 3. 破坏性变更
 
 ```
 feat(api)!: redesign user profile response structure
@@ -351,89 +388,8 @@ object. Migrate by accessing `profile.data` instead of flat fields.
 Refs: #89
 ```
 
-```
-feat!: replace legacy authentication module with JWT
-
-The old session-based auth has been replaced. All clients
-must update to use JWT tokens in the Authorization header.
-
-BREAKING CHANGE: session cookies are no longer supported.
-Use the `/auth/token` endpoint to obtain a JWT.
-
-Refs: #156
-```
-
-### 6. 文档变更
+### 4. 文档变更
 
 ```
 docs: add API rate limiting section to README
 ```
-
-### 7. 构建变更
-
-```
-build(deps): upgrade webpack to v5.80
-```
-
-### 8. CI 变更
-
-```
-ci: add GitHub Actions workflow for automated testing
-```
-
-### 9. 回退提交
-
-```
-revert: let us never again speak of the noodle incident
-
-Refs: 676104e, a215868
-```
-
-### 10. 样式变更
-
-```
-style: fix indentation and remove trailing whitespace
-```
-
-## 禁止事项
-
-1. **禁止使用无意义的提交信息**，如 `update`、`fix bug`、`wip`、`misc` 等。
-2. **禁止在描述中使用过去时**，应使用祈使句（如 "add" 而非 "added" 或 "adds"）。
-3. **禁止在描述末尾加句号**。
-4. **禁止在类型或范围中使用中文**。
-5. **禁止遗漏破坏性变更声明**，凡涉及 API 不兼容变更的提交必须声明 `BREAKING CHANGE` 或使用 `!` 标记。
-6. **禁止在一个提交中混合多个不相关的变更**，应拆分为多个独立提交。
-7. **禁止 `BREAKING CHANGE` 使用小写**，必须全大写。
-8. **禁止未经用户确认直接执行 `git commit`**，生成提交信息后必须先展示给用户，经用户明确确认后方可执行提交。
-
-## 行为规范
-
-### 提交信息检查
-
-当用户要求检查提交信息规范性时：
-
-1. 逐一对照本规范进行检查。
-2. 重点检查：类型是否合法、描述是否超长、是否使用祈使句、破坏性变更是否声明、中文格式是否正确。
-3. 指出不符合规范的具体位置和原因。
-4. 提供修改后的完整提交信息。
-
-### 提交信息编写
-
-当用户要求编写提交信息时：
-
-1. 分析本次代码变更的内容和范围。
-2. 选择最合适的 type 和 scope。
-3. 按照 `<type>[(scope)][!]: <description>` 格式撰写首行。
-4. 如有需要，补充正文和页脚。
-5. 确保描述不超过 72 字符，使用祈使句。
-6. 破坏性变更必须声明。
-7. **将生成的完整提交信息展示给用户，等待用户确认。** 用户确认后方可执行 `git commit`，用户要求修改则调整后重新确认。
-
-### 提交信息格式化
-
-当用户要求格式化现有提交信息时：
-
-1. 保留原意，调整格式使其符合规范。
-2. 补充缺失的 type 或 scope。
-3. 修正时态、去除句号。
-4. 超长描述进行精简或移入正文部分。
