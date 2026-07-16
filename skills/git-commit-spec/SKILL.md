@@ -60,7 +60,7 @@ description: Git 提交规范的检查、格式化与编写指导，基于 Conve
 
 1. 分析本次代码变更的内容和范围。
 2. 选择最合适的 type 和 scope，按 `<type>[(scope)][!]: <description>` 格式撰写首行（type/scope 定义见下方「提交信息格式」）。确保描述不超过 72 字符，使用祈使句，破坏性变更必须声明。
-3. 如有需要，补充正文和页脚。
+3. 如有需要，补充正文和页脚。**当一次提交包含多个变更要点时，正文优先使用列表逐条展开**，每条聚焦一个变更点；背景说明等纯叙述内容可用段落。
 4. **【硬节点】将完整的提交信息展示给用户，等待明确确认：**
    - 用户确认（「确认 / ok / 同意」）→ 执行 `git commit`
    - 用户要求修改 → 调整后重新回到第 4 步展示
@@ -178,10 +178,12 @@ feat: this is a very very very very very very very very very very long descripti
 
 - 与描述之间空一行。
 - 用于提供比描述更详细的上下文信息。
-- 可以包含多段内容，段落之间空一行。
+- **当变更包含多个要点时，推荐使用列表逐条展开**，避免堆砌长段落，提升可读性。
+- 列表项使用 `-` 开头，每条聚焦一个变更点，措辞简洁（祈使句或动宾短语）。
+- 纯叙述性内容（如背景说明、设计取舍）仍可使用段落，段落之间空一行。
 - 每行不超过 **100 字符**。
 
-【**示例**】
+【**段落形式示例**】
 
 ```
 fix: prevent racing of requests
@@ -191,6 +193,31 @@ incoming responses other than from latest request.
 
 Remove timeouts which were used to mitigate the racing issue but are
 obsolete now.
+```
+
+【**列表形式示例（推荐，多要点时使用）**】
+
+```
+feat(auth): 重构用户认证模块
+
+- 新增 JWT token 签发与校验逻辑
+- 移除旧的 session 认证方式
+- 支持多端登录与 token 刷新机制
+- 补充单元测试覆盖核心认证流程
+```
+
+【**段落 + 列表混排示例**】
+
+```
+refactor(api): 优化订单查询接口性能
+
+针对订单列表加载缓慢的问题进行性能优化，主要改动如下：
+
+- 为 order 表的 user_id 字段新增联合索引
+- 将 N+1 查询重构为批量预加载
+- 引入 Redis 缓存热点数据，TTL 设为 5 分钟
+
+压测数据显示 P99 响应时间从 1.2s 降至 180ms。
 ```
 
 ### 4. 页脚（footer）- 可选
@@ -375,6 +402,15 @@ Refs: #42
 
 ```
 fix(parser): handle empty array in JSON parsing
+```
+
+```
+fix(parser): 修复 JSON 解析数组时的多个边界问题
+
+- 处理空数组解析为 null 的错误
+- 修复尾随逗号导致的解析中断
+- 统一异常处理路径，避免静默失败
+- 补充对应单元测试用例
 ```
 
 ### 3. 破坏性变更
