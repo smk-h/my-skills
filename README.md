@@ -8,6 +8,7 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 |:------|:------|
 | [c-lang-spec](./skills/c-lang-spec/SKILL.md) | C 语言编程规范的代码检查与格式化指导 |
 | [code-spec](./skills/code-spec/SKILL.md) | Spec 驱动开发：依次生成 spec/plan/task/checklist 四份文档，指导开发与验收 |
+| [graphviz-diagram](./skills/graphviz-diagram/SKILL.md) | 用 Graphviz dot 画架构图/流程图/拓扑图/依赖图并转 SVG 嵌入文档，固化在线渲染的中文字体/标签换行/布局避坑方案，自带 render-dot.mjs |
 | [makefile-spec](./skills/makefile-spec/SKILL.md) | Makefile 编写规范的代码检查、格式化与编写指导 |
 | [markdowncli](./skills/markdowncli/SKILL.md) | 按指定规范创建或者修改 markdown 文件 |
 | [plantuml-diagram](./skills/plantuml-diagram/SKILL.md) | 用 PlantUML 画架构图/时序图/流程图并转 SVG 嵌入文档，固化在线渲染的中文/皮肤/布局避坑方案，自带 render-puml.mjs |
