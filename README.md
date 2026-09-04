@@ -11,6 +11,7 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 | [makefile-spec](./skills/makefile-spec/SKILL.md) | Makefile 编写规范的代码检查、格式化与编写指导 |
 | [markdowncli](./skills/markdowncli/SKILL.md) | 按指定规范创建或者修改 markdown 文件 |
 | [plantuml-diagram](./skills/plantuml-diagram/SKILL.md) | 用 PlantUML 画架构图/时序图/流程图并转 SVG 嵌入文档，固化在线渲染的中文/皮肤/布局避坑方案，自带 render-puml.mjs |
+| [excalidraw-diagram](./skills/excalidraw-diagram/SKILL.md) | 用 Excalidraw 绘制可自由拖拽编辑的手绘风格配图，自带渲染与校验脚本 |
 | [ts-lang-spec](./skills/ts-lang-spec/SKILL.md) | TypeScript 语言编程规范的代码检查与格式化指导 |
 | [git-commit-spec](./skills/git-commit-spec/SKILL.md) | Git 提交规范的检查、格式化与编写指导，基于 Conventional Commits 规范 |
 | [typora-plugin-updater](./skills/typora-plugin-updater/SKILL.md) | 为 Windows 版 Typora 安装/升级 typora_plugin 插件，处理 GitHub 直连失败、UAC 提权闪退、配置覆盖等坑 |

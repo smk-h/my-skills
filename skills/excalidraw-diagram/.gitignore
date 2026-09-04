@@ -1,0 +1,3 @@
+# 渲染运行时依赖（首次运行由 render-excalidraw.mjs 自动安装，体积约 100MB，不入库）
+.render-runtime/
+node_modules/
