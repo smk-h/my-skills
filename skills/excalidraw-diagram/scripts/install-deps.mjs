@@ -19,15 +19,17 @@ import { fileURLToPath } from "node:url";
 export const SKILL_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const RUNTIME_DIR = path.join(SKILL_DIR, ".render-runtime");
 
-/** 依赖清单：@excalidraw/utils 是预发布版，必须锁死精确版本 */
-export const DEPS = ["@excalidraw/utils@0.1.3-test32", "jsdom@^26.0.0"];
+/** 依赖清单：@excalidraw/utils 是预发布版，必须锁死精确版本；
+ *  @resvg/resvg-js 供 svg2png.mjs 视觉验收用，预编译二进制、无系统库依赖，同样锁死 */
+export const DEPS = ["@excalidraw/utils@0.1.3-test32", "jsdom@^26.0.0", "@resvg/resvg-js@2.6.2"];
 
-/** 依赖是否已就绪（两个包都能解析到即视为就绪） */
+/** 依赖是否已就绪（全部包都能解析到即视为就绪） */
 export function depsReady() {
   try {
     const req = createRequire(path.join(RUNTIME_DIR, "noop.js"));
     req.resolve("@excalidraw/utils");
     req.resolve("jsdom");
+    req.resolve("@resvg/resvg-js");
     return true;
   } catch {
     return false;

@@ -154,11 +154,21 @@ node <skill>/scripts/render-excalidraw.mjs 某主题/xxx.excalidraw [--out-dir <
 
 静态校验挡不住**渲染层语义坑**（样条甩尾、遮罩失效、标签重叠），改完图必须看一眼产物：
 
-1. SVG → PNG：无 rsvg/inkscape 时用无头浏览器，如
-   `firefox --headless --no-remote --profile /tmp/ffprof --screenshot out.png "file://...svg" --window-size=W,H`
-   （firefox 已有实例在跑时必须用 `--profile` 隔离 + `--no-remote`，否则直接退出码 2 失败）
-2. 验收看点：箭头两端是否贴框、折线无甩尾、标签遮罩下虚线不穿字、无重叠截断；
+1. SVG → PNG 用内置脚本（`@resvg/resvg-js` 预编译二进制，零系统依赖，首次运行自动安装）：
+
+   ```bash
+   node <skill>/scripts/svg2png.mjs 某主题/img/xxx.excalidraw.svg [--width <px>]
+   ```
+
+   产物为同目录 `xxx.excalidraw.png`，仅验收用，可随删
+2. **PNG 中中文显示为方框 = 验收环境缺 CJK 字体**（脚本会检测并提示），
+   SVG 本身正常——浏览器 / Excalidraw 打开即正确，不要因此返工改图
+3. 验收看点：箭头两端是否贴框、折线无甩尾、标签遮罩下虚线不穿字、无重叠截断；
    逐项给出 pass/fail 证据，不通过就回源 JSON 修再重渲染，**禁止手改 SVG**
+
+内置脚本不可用时的兜底（如老版本技能）：rsvg / inkscape / 无头浏览器，如
+`firefox --headless --no-remote --profile /tmp/ffprof --screenshot out.png "file://...svg" --window-size=W,H`
+（firefox 已有实例在跑时必须用 `--profile` 隔离 + `--no-remote`，否则直接退出码 2 失败）
 
 ## 已有场景的解析与修改
 
@@ -174,6 +184,8 @@ node <skill>/scripts/render-excalidraw.mjs 某主题/xxx.excalidraw [--out-dir <
 
 - `install-deps.mjs` —— 安装渲染依赖到 `.render-runtime/`，支持 `--check` / `--force` / `--remove`
 - `render-excalidraw.mjs` —— 场景 → SVG 渲染，含 DOM 垫片，依赖缺失时自动调用安装脚本
+- `svg2png.mjs` —— SVG → PNG（视觉验收用，`@resvg/resvg-js` 预编译二进制、零系统依赖），
+  支持 `--out-dir` / `--width` / `--zoom`；缺中文字体时提示「方框是环境问题而非 SVG 问题」
 - `validate-scene.mjs` —— 零依赖结构校验，`--fix` 可自动补齐字段
 
 ### 参考（references/）
