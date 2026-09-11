@@ -205,6 +205,7 @@ function Remove-DanglingLinks {
             $tgt = Get-LinkTarget -Path $dst
             # dangling when the link target no longer exists (removed from mirror)
             if (-not $tgt -or -not (Test-Path -LiteralPath "$tgt")) {
+                # 只摘除链接条目本身: Directory.Delete 不跟随重解析点, 也不动目标
                 [System.IO.Directory]::Delete($dst, $false)
                 Write-Host ("    {0}: {1} dangling link removed" -f $script:tools[$key].Name, $name) -ForegroundColor DarkGray
                 $total++

@@ -4,7 +4,7 @@
 # * File name  : test-linux-skills.sh
 # * Author     : 苏木
 # * Date       : 2026/06/28
-# * Version    : 1.1.0
+# * Version    : 1.2.0
 # * Description: linux-skills.sh 端到端测试（纯测试逻辑）
 # *
 # * 本脚本仅负责 Linux / 容器内的测试逻辑。
@@ -383,11 +383,19 @@ run_tests() {
     assert_case "仓库文件已还原" check_repo_restored
 
     # --------------------------------------------------------
-    # 7. update (孤儿清理)
+    # 7. update (孤儿清理 + 失效链接清理)
     # --------------------------------------------------------
-    c_group "7. update (孤儿清理)"
-    mkdir -p "${MIRROR}/__orphan_test__"
-    echo "fake" > "${MIRROR}/__orphan_test__/SKILL.md"
+    c_group "7. update (孤儿清理 + 失效链接清理)"
+    local orphan_name="__orphan_test__"
+    mkdir -p "${MIRROR}/${orphan_name}"
+    echo "fake" > "${MIRROR}/${orphan_name}/SKILL.md"
+
+    # 造悬空软链：模拟「该孤儿技能此前已被 link 到 agent」
+    ln -s "${MIRROR}/${orphan_name}" "${TOOLS[claude]}/${orphan_name}"
+    # 造同名真实目录：应被保护，不被误删
+    mkdir -p "${TOOLS[roo]}/${orphan_name}"
+    echo "keep" > "${TOOLS[roo]}/${orphan_name}/keep.txt"
+
     local before_cnt=0 n
     for n in $SKILLS; do [ -d "${MIRROR}/${n}" ] && before_cnt=$((before_cnt+1)); done
     before_cnt=$((before_cnt + 1))  # 含造的孤儿
@@ -402,6 +410,32 @@ run_tests() {
         [ $cnt -eq $SKILL_COUNT ]
     }
     assert_case "update 后 mirror skill 数 = $SKILL_COUNT" check_orphan_count
+
+    # 新增：孤儿技能对应的 agent 侧失效软链应被清理
+    assert_case "update 清理了 claude 中该技能的失效软链" \
+        "[ ! -L \"${TOOLS[claude]}/${orphan_name}\" ] && [ ! -e \"${TOOLS[claude]}/${orphan_name}\" ]"
+    check_no_dangling() {
+        local tk left=0
+        for tk in "${TOOL_KEYS[@]}"; do
+            [ -L "${TOOLS[$tk]}/${orphan_name}" ] && left=$((left+1))
+        done
+        c_diag "残留失效软链: $left (期望 0)"
+        [ $left -eq 0 ]
+    }
+    assert_case "update 后各 agent 无残留失效软链" check_no_dangling
+    # 安全性：同名真实目录不得被删除
+    assert_case "update 不误删同名真实目录 (roo)" "[ -f \"${TOOLS[roo]}/${orphan_name}/keep.txt\" ]"
+    # 安全性：正常技能链接不受影响
+    check_normal_links_intact() {
+        local s ok=1
+        for s in $SKILLS; do is_link "${TOOLS[claude]}/${s}" || { c_diag "claude/${s} 非软链"; ok=0; }; done
+        [ $ok -eq 1 ]
+    }
+    assert_case "update 后正常技能链接未被误删" check_normal_links_intact
+
+    # 清理本次注入的测试残留，保持环境干净
+    rm -rf "${TOOLS[roo]}/${orphan_name}"
+    rm -f "${TOOLS[claude]}/${orphan_name}"
 
     # --------------------------------------------------------
     # 8. 仓库源完整性终检

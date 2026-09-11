@@ -85,13 +85,19 @@ function Get-FileCount {
     return @(Get-ChildItem -LiteralPath $Path -Recurse -File -Force -ErrorAction SilentlyContinue).Count
 }
 
-# 判断路径是否为 reparse point
+# 判断路径是否为 reparse point (junction/symlink)
+# 用 GetAttributes 直接读目录项属性, 不跟随重解析点:
+# 即使链接目标已删除(悬空链接)也能正确识别。
 function Test-IsLink {
     param([string]$Path)
-    if (-not (Test-Path -LiteralPath $Path)) { return $false }
-    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
-    if (-not $item) { return $false }
-    return ($item.Attributes.ToString() -match 'ReparsePoint')
+    try { $attr = [System.IO.File]::GetAttributes($Path) } catch { return $false }
+    return (($attr -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
+}
+
+# 判断目录项是否存在 (不跟随重解析点, 可识别悬空链接)
+function Test-PathEntryExists {
+    param([string]$Path)
+    try { $null = [System.IO.File]::GetAttributes($Path); return $true } catch { return $false }
 }
 
 # 记录仓库 skill md5 基线 (测试全程不变量)
@@ -361,23 +367,60 @@ function Run-Tests {
     }
 
     # --------------------------------------------------------
-    # 7. -update (孤儿清理)
+    # 7. -update (孤儿清理 + 失效链接清理)
     # --------------------------------------------------------
-    Start-Group "7. -update (孤儿清理)"
-    $orphan = Join-Path $script:mirror "__orphan_test__"
+    Start-Group "7. -update (孤儿清理 + 失效链接清理)"
+    $orphanName = "__orphan_test__"
+    $orphan = Join-Path $script:mirror $orphanName
     New-Item -Path $orphan -ItemType Directory -Force | Out-Null
     "fake" | Out-File -LiteralPath (Join-Path $orphan "SKILL.md") -Encoding UTF8
+
+    # 造悬空 junction: 模拟「该孤儿技能此前已被 link 到 agent」
+    $claudeOrphan = Join-Path $script:tools['claude'] $orphanName
+    New-Item -ItemType Junction -Path $claudeOrphan -Target $orphan | Out-Null
+    # 造同名真实目录: 应被保护, 不被误删
+    $rooOrphan = Join-Path $script:tools['roo'] $orphanName
+    New-Item -Path $rooOrphan -ItemType Directory -Force | Out-Null
+    "keep" | Out-File -LiteralPath (Join-Path $rooOrphan "keep.txt") -Encoding UTF8
+
     $beforeCnt = @(Get-ChildItem -LiteralPath $script:mirror -Directory -Force).Count
     Write-Diag "造孤儿前 mirror skill 数: $beforeCnt"
 
-    $out = Invoke-Target -Arguments @("-update")
-    Assert-Case "update 清理了孤儿目录" {
-        -not (Test-Path -LiteralPath $orphan)
-    }
-    Assert-Case "update 后 mirror skill 数 = $($script:skillCount)" {
-        $cnt = @(Get-ChildItem -LiteralPath $script:mirror -Directory -Force).Count
-        Write-Diag "mirror skill 数: $cnt (期望 $($script:skillCount))"
-        $cnt -eq $script:skillCount
+    try {
+        $null = Invoke-Target -Arguments @("-update")
+        Assert-Case "update 清理了孤儿目录" {
+            -not (Test-Path -LiteralPath $orphan)
+        }
+        Assert-Case "update 后 mirror skill 数 = $($script:skillCount)" {
+            $cnt = @(Get-ChildItem -LiteralPath $script:mirror -Directory -Force).Count
+            Write-Diag "mirror skill 数: $cnt (期望 $($script:skillCount))"
+            $cnt -eq $script:skillCount
+        }
+
+        # 新增: 孤儿技能对应的 agent 侧失效 junction 应被清理
+        Assert-Case "update 清理了 claude 中该技能的失效 junction" {
+            -not (Test-PathEntryExists $claudeOrphan)
+        }
+        # 安全性: 同名真实目录不得被删除
+        Assert-Case "update 不误删同名真实目录 (roo)" {
+            Test-Path -LiteralPath (Join-Path $rooOrphan "keep.txt")
+        }
+        # 安全性: 正常技能链接不受影响
+        Assert-Case "update 后正常技能链接未被误删" {
+            $ok = $true
+            foreach ($s in $script:skillNames) {
+                if (-not (Test-IsLink (Join-Path $script:tools['claude'] $s))) { Write-Diag "claude/$s 非链接"; $ok = $false }
+            }
+            $ok
+        }
+    } finally {
+        # 清理本次注入的测试残留, 保持环境干净
+        if (Test-PathEntryExists $rooOrphan) { Remove-Item -LiteralPath $rooOrphan -Recurse -Force -ErrorAction SilentlyContinue }
+        if (Test-PathEntryExists $claudeOrphan) {
+            # 清理失败不应中断整套用例, 故兜底捕获
+            try { [System.IO.Directory]::Delete($claudeOrphan, $false) }
+            catch { Remove-Item -LiteralPath $claudeOrphan -Force -ErrorAction SilentlyContinue }
+        }
     }
 
     # --------------------------------------------------------
