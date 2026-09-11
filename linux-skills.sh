@@ -4,7 +4,7 @@
 # * File name  : linux-skills.sh
 # * Author     : 苏木
 # * Date       : 2026/06/28
-# * Version    : 1.2.0
+# * Version    : 1.3.0
 # * Description: 在 Linux 下用「符号链接」安装 skills 到各 AI 扩展
 # *
 # * 拓扑（解耦仓库路径与 agent 链接）:
@@ -86,6 +86,34 @@ get_skill_description() {
 }
 
 # ========================================================
+# 清理各 agent 工具中指向「已删除技能」的失效软链
+# 参数: $@ - 本轮已从 ~/.smskills 删除的 skill 名列表
+# 说明: 统一遍历一次工具目录，避免对每个技能重复扫描
+#       仅删除「软链且目标已失效」的项，真实目录一律跳过
+# ========================================================
+cleanup_dangling_links() {
+    [ $# -eq 0 ] && return 0
+    local -a names=("$@")
+    local total=0 k name dst_dir dst_skill removed
+    for k in "${TOOL_KEYS[@]}"; do
+        dst_dir=$(get_tool_path "$k")
+        [ -d "${dst_dir}" ] || continue
+        removed=0
+        for name in "${names[@]}"; do
+            dst_skill="${dst_dir}/${name}"
+            if [ -L "${dst_skill}" ] && [ ! -e "${dst_skill}" ]; then
+                rm -f "${dst_skill}"
+                dim "    $(get_tool_name "$k"): ${name} dangling link removed"
+                removed=$((removed + 1))
+            fi
+        done
+        total=$((total + removed))
+    done
+    [ ${total} -gt 0 ] && success "cleaned ${total} dangling link(s) in agent tools."
+    return 0
+}
+
+# ========================================================
 # update：把仓库 skills/ 镜像覆盖到 ~/.smskills/
 # ~/.smskills 是仓库的本地镜像：仓库有的覆盖/新增，仓库没有的（孤儿）删除
 # ========================================================
@@ -128,15 +156,23 @@ update_skills() {
     done < <(get_skill_names "${REPO_SKILLS_DIR}")
 
     # 2) 清理孤儿：~/.smskills 有但仓库已没有的
+    #    顺手记录被删的技能名，供第 3 步统一清理 agent 侧的失效软链
+    local -a orphans=()
     for item in "${SMSKILLS_DIR}"/*/; do
         [ -d "$item" ] || continue
         name=$(basename "$item")
         if [ ! -d "${REPO_SKILLS_DIR}/${name}" ]; then
             rm -rf "${SMSKILLS_DIR}/${name}"
             warning "    ${name} removed (no longer in repo)"
+            orphans+=("$name")
             orphan=$((orphan + 1))
         fi
     done
+
+    # 3) 清理各 agent 工具中指向已删除技能的失效软链（一次遍历，仅删软链）
+    if [ ${#orphans[@]} -gt 0 ]; then
+        cleanup_dangling_links "${orphans[@]}"
+    fi
 
     success "mirror done: ${added} added, ${updated} updated, ${orphan} orphan removed."
     dim "    ${SMSKILLS_DIR} 现为仓库的完整镜像。"

@@ -74,10 +74,14 @@ $script:tools = [ordered]@{
 # ========================================================
 function Test-ReparsePoint {
     param([string]$Path)
-    if (-not (Test-Path -LiteralPath $Path)) { return $false }
-    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
-    if (-not $item) { return $false }
-    return ($item.Attributes.ToString() -match 'ReparsePoint')
+    # 直接读目录项属性，不跟随重解析点：即使链接目标已被删除
+    # （悬空 junction/symlink）也能正确识别为链接。
+    try {
+        $attr = [System.IO.File]::GetAttributes($Path)
+    } catch {
+        return $false
+    }
+    return (($attr -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
 }
 
 # ========================================================
@@ -161,6 +165,8 @@ function Update-Skills {
     }
 
     # 2) orphan cleanup: in mirror but not in repo
+    #    Collect removed names so step 3 can clean agent-side dangling links once.
+    $orphanNames = @()
     foreach ($name in (Get-SkillNamesFrom -BasePath $script:mirrorPath)) {
         $repoItem = Join-Path $script:srcPath $name
         if (-not (Test-Path -LiteralPath $repoItem)) {
@@ -168,13 +174,46 @@ function Update-Skills {
             if (Test-ReparsePoint -Path $m) { [System.IO.Directory]::Delete($m, $false) }
             else { Remove-Item -LiteralPath $m -Recurse -Force }
             Write-Host ("    {0,-16} removed (no longer in repo)" -f $name) -ForegroundColor Yellow
+            $orphanNames += $name
             $orphan++
         }
     }
 
+    # 3) remove dangling links in agent tools for the removed skills (single pass)
+    Remove-DanglingLinks -Names $orphanNames
+
     Write-Host ""
     Write-Host ("  Mirror ready: {0} added, {1} updated, {2} orphan removed." -f $added, $updated, $orphan) -ForegroundColor Green
     Write-Host ""
+}
+
+# ========================================================
+# Remove dangling junctions/symlinks left by deleted skills.
+# Iterates every tool dir once for the whole removed-name list.
+# Real directories are never touched.
+# ========================================================
+function Remove-DanglingLinks {
+    param([string[]]$Names)
+    if (-not $Names -or $Names.Count -eq 0) { return }
+    $total = 0
+    foreach ($key in $script:tools.Keys) {
+        $path = $script:tools[$key].Path
+        if (-not (Test-Path -LiteralPath $path)) { continue }
+        foreach ($name in $Names) {
+            $dst = Join-Path $path $name
+            if (-not (Test-ReparsePoint -Path $dst)) { continue }
+            $tgt = Get-LinkTarget -Path $dst
+            # dangling when the link target no longer exists (removed from mirror)
+            if (-not $tgt -or -not (Test-Path -LiteralPath "$tgt")) {
+                [System.IO.Directory]::Delete($dst, $false)
+                Write-Host ("    {0}: {1} dangling link removed" -f $script:tools[$key].Name, $name) -ForegroundColor DarkGray
+                $total++
+            }
+        }
+    }
+    if ($total -gt 0) {
+        Write-Host ("  Cleaned {0} dangling link(s) in agent tools." -f $total) -ForegroundColor Green
+    }
 }
 
 # ========================================================

@@ -56,7 +56,7 @@ Windows 下使用 `windows-skills.ps1`（Junction，无需管理员权限），L
 | 命令 | 作用 |
 |:-----|:-----|
 | `install` / `-install` | 一键安装：`update` + `link all` |
-| `update` / `-update` | 把仓库 `skills/` 镜像覆盖到 `~/.smskills`（含孤儿清理） |
+| `update` / `-update` | 把仓库 `skills/` 镜像覆盖到 `~/.smskills`（含孤儿清理，并同步清理各 agent 工具中指向已删技能的失效链接） |
 | `link [tool] [force]` | 把 `~/.smskills/<skill>` 链接到各 agent 工具 |
 | `unlink [tool]` | 删除工具的链接（仅删链接，`~/.smskills` 源不动） |
 | `list` / `-l` | 列出已安装 skills（带 link/copy 标记） |
