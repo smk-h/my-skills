@@ -38,6 +38,7 @@ $script:tools = @{
     opencode = Join-Path $env:USERPROFILE ".config\opencode\skills"
     codebuddy = Join-Path $env:USERPROFILE ".codebuddy\skills"
     codex    = Join-Path $env:USERPROFILE ".codex\skills"
+    dsh      = Join-Path $env:USERPROFILE ".dsh\skills"
 }
 
 # 仓库 skill 列表：动态扫描仓库 skills/ 目录下的子目录（不硬编码）
@@ -47,7 +48,7 @@ if (Test-Path -LiteralPath $script:repoSkills) {
         Select-Object -ExpandProperty Name | Sort-Object
 }
 $script:skillCount = $script:skillNames.Count
-$script:toolKeys = @("claude", "roo", "zcode", "opencode", "codebuddy", "codex")
+$script:toolKeys = @("claude", "roo", "zcode", "opencode", "codebuddy", "codex", "dsh")
 
 # 计数器
 $script:pass = 0
@@ -275,7 +276,7 @@ function Run-Tests {
     Start-Group "4. -l (列表)"
     $out = Invoke-Target -Arguments @("-l")
     # 用实际显示名匹配 (大小写不敏感)
-    $displayNames = @("Claude Code", "RooCode", "ZCode", "OpenCode", "CodeBuddy", "Codex")
+    $displayNames = @("Claude Code", "RooCode", "ZCode", "OpenCode", "CodeBuddy", "Codex", "DeepSeek Harness")
     Assert-Case "list 含所有工具显示名" {
         $lower = $out.ToLower()
         $ok = $true

@@ -62,7 +62,7 @@ Windows 下使用 `windows-skills.ps1`（Junction，无需管理员权限），L
 | `list` / `-l` | 列出已安装 skills（带 link/copy 标记） |
 | `status` / `-status` | 显示链接状态矩阵 |
 
-> 支持的 agent 工具：`claude`、`roo`、`zcode`、`opencode`、`codebuddy`、`codex`。
+> 支持的 agent 工具：`claude`、`roo`、`zcode`、`opencode`、`codebuddy`、`codex`、`dsh`（DeepSeek Harness，安装到 `~/.dsh/skills`）。
 
 ### 2. 使用 npx skills add 安装
 

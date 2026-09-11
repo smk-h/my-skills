@@ -4,7 +4,7 @@
 # * File name  : linux-skills.sh
 # * Author     : 苏木
 # * Date       : 2026/06/28
-# * Version    : 1.1.0
+# * Version    : 1.2.0
 # * Description: 在 Linux 下用「符号链接」安装 skills 到各 AI 扩展
 # *
 # * 拓扑（解耦仓库路径与 agent 链接）:
@@ -54,9 +54,10 @@ TOOLS[zcode]="${HOME}/.zcode/skills|ZCode"
 TOOLS[opencode]="${HOME}/.config/opencode/skills|OpenCode"
 TOOLS[codebuddy]="${HOME}/.codebuddy/skills|CodeBuddy"
 TOOLS[codex]="${HOME}/.codex/skills|Codex"
+TOOLS[dsh]="${HOME}/.dsh/skills|DeepSeek Harness"
 
 # 工具标识顺序
-TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy" "codex")
+TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy" "codex" "dsh")
 
 # 查表
 get_tool_path() { local e="${TOOLS[$1]}"; echo "${e%%|*}"; }
