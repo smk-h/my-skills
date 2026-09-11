@@ -20,14 +20,10 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 
 ## 二、安装skills
 
-skills 支持两种安装方式：
+skills 以软链接方式安装到各 AI 扩展：skills 只存一份，各工具通过链接共享，改仓库即全员生效。
+Windows 下使用 `windows-skills.ps1`（Junction，无需管理员权限），Linux / macOS 下使用 `linux-skills.sh`（符号链接 `ln -s`）。
 
-| 方式 | 脚本 | 特点 |
-|:------|:-----|:-----|
-| **软链接（推荐）** | `linux-skills.sh` / `windows-skills.ps1` | skills 只存一份，各工具通过链接共享，改仓库即全员生效 |
-| 拷贝（传统） | `install.sh` / `install.ps1` | 每个工具各存一份独立拷贝 |
-
-### 1. 软链接安装（推荐）
+### 1. 使用仓库脚本安装（推荐）
 
 软链接方案通过 `~/.smskills` 本地镜像层，解耦仓库路径与 agent 链接：
 
@@ -68,60 +64,7 @@ skills 支持两种安装方式：
 
 > 支持的 agent 工具：`claude`、`roo`、`zcode`、`opencode`、`codebuddy`、`codex`。
 
-### 2. 拷贝安装（传统）
-
-### 2.1 Windows
-
-使用 `install.ps1` 管理 skills 的安装、删除和列表：
-
-```powershell
-# 显示帮助
-./install.ps1 -h
-
-# 列出所有已安装的 skills
-./install.ps1 -l
-
-# 安装 skills 到指定工具（claude/opencode/roo/all）
-./install.ps1 -add roo           # 安装到 Roo，已存在时询问是否覆盖
-./install.ps1 -add roo -f        # 强制覆盖，不询问
-./install.ps1 -add all -f        # 强制覆盖安装到所有工具
-
-# 删除指定工具的所有 skills（claude/opencode/roo/all）
-./install.ps1 -d claude          # 删除 Claude Code 的 skills
-./install.ps1 -d all             # 删除所有工具的 skills
-```
-
-> **注意**：`install.ps1` 含中文注释，PowerShell 5.1 需要 UTF-8 BOM 才能正确解析。如果脚本被其他编辑器重新保存，请确保保留 UTF-8 BOM 编码（文件开头 3 字节 `EF BB BF`）。
-
-### 2.2 Linux / macOS
-
-使用 `install.sh` 管理 skills 的安装、卸载和状态查看：
-
-```bash
-# 无参数运行进入交互式菜单
-./install.sh
-
-# 安装（旧版命令，兼容保留）
-./install.sh all          # 安装到所有 AI 扩展
-./install.sh roocode      # 安装到 RooCode    (~/.roo/skills/)
-./install.sh claude       # 安装到 Claude Code (~/.claude/skills/)
-./install.sh codebuddy    # 安装到 CodeBuddy  (~/.codebuddy/skills/)
-./install.sh opencode     # 安装到 OpenCode    (~/.config/opencode/skills/)
-
-# 安装（新版命令）
-./install.sh install roocode           # 安装到 RooCode
-./install.sh install all force         # 强制覆盖安装到所有工具
-
-# 查看与卸载
-./install.sh status                    # 显示安装状态
-./install.sh list                      # 列出所有已安装的技能
-./install.sh list claude               # 列出 Claude Code 的技能
-./install.sh uninstall                 # 卸载所有已安装的技能（兼容旧版）
-./install.sh remove all                # 卸载所有工具的技能（新版）
-./install.sh help                      # 显示帮助信息
-```
-
-### 3. 使用 npx skills add 安装
+### 2. 使用 npx skills add 安装
 
 通过 [skills CLI](https://github.com/vercel-labs/skills) 可一键将本仓库的技能安装到 OpenCode、Claude Code 等 AI 编程工具：
 
