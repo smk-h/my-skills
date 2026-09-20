@@ -10,6 +10,7 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 | [code-spec](./skills/code-spec/SKILL.md) | Spec 驱动开发：依次生成 spec/plan/task/checklist 四份文档，指导开发与验收 |
 | [makefile-spec](./skills/makefile-spec/SKILL.md) | Makefile 编写规范的代码检查、格式化与编写指导 |
 | [markdowncli](./skills/markdowncli/SKILL.md) | 按指定规范创建或者修改 markdown 文件 |
+| [mist-docs](./skills/mist-docs/SKILL.md) | 在 mist 主题文档库（tdoc 工具链）中新建文章/章节/index.md、补 frontmatter、维护 path-map.js 映射 |
 | [plantuml-diagram](./skills/plantuml-diagram/SKILL.md) | 用 PlantUML 画架构图/时序图/流程图并转 SVG 嵌入文档，固化在线渲染的中文/皮肤/布局避坑方案，自带 render-puml.mjs |
 | [excalidraw-diagram](./skills/excalidraw-diagram/SKILL.md) | 用 Excalidraw 绘制可自由拖拽编辑的手绘风格配图，自带渲染与校验脚本 |
 | [ts-lang-spec](./skills/ts-lang-spec/SKILL.md) | TypeScript 语言编程规范的代码检查与格式化指导 |
