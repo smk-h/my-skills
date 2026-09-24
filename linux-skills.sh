@@ -55,9 +55,10 @@ TOOLS[opencode]="${HOME}/.config/opencode/skills|OpenCode"
 TOOLS[codebuddy]="${HOME}/.codebuddy/skills|CodeBuddy"
 TOOLS[codex]="${HOME}/.codex/skills|Codex"
 TOOLS[dsh]="${HOME}/.dsh/skills|DeepSeek Harness"
+TOOLS[workbuddy]="${HOME}/.workbuddy/skills|WorkBuddy"
 
 # 工具标识顺序
-TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy" "codex" "dsh")
+TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy" "codex" "dsh" "workbuddy")
 
 # 查表
 get_tool_path() { local e="${TOOLS[$1]}"; echo "${e%%|*}"; }

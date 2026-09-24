@@ -44,7 +44,8 @@ TOOLS[opencode]="${HOME}/.config/opencode/skills"
 TOOLS[codebuddy]="${HOME}/.codebuddy/skills"
 TOOLS[codex]="${HOME}/.codex/skills"
 TOOLS[dsh]="${HOME}/.dsh/skills"
-TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy" "codex" "dsh")
+TOOLS[workbuddy]="${HOME}/.workbuddy/skills"
+TOOL_KEYS=("claude" "roo" "zcode" "opencode" "codebuddy" "codex" "dsh" "workbuddy")
 
 # 技能列表：动态扫描仓库 skills/ 目录下的子目录（不硬编码）
 # 每个子目录视为一个 skill
@@ -284,7 +285,7 @@ run_tests() {
     # --------------------------------------------------------
     c_group "4. list (列表)"
     out=$(invoke_target list)
-    DISPLAY_NAMES=("Claude Code" "RooCode" "ZCode" "OpenCode" "CodeBuddy" "Codex" "DeepSeek Harness")
+    DISPLAY_NAMES=("Claude Code" "RooCode" "ZCode" "OpenCode" "CodeBuddy" "Codex" "DeepSeek Harness" "WorkBuddy")
     check_list_tools() {
         local n ok=1 lower
         lower=$(echo "$out" | tr 'A-Z' 'a-z')

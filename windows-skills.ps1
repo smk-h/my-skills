@@ -1,6 +1,6 @@
 ﻿# ========================================================
 # Skills Manager for AI Extensions (Windows, Junction mode)
-# Manage skills for Claude Code / RooCode / ZCode / OpenCode / CodeBuddy / Codex / DeepSeek Harness.
+# Manage skills for Claude Code / RooCode / ZCode / OpenCode / CodeBuddy / Codex / DeepSeek Harness / WorkBuddy.
 #
 # Topology (decouples repo path from agent links):
 #   repo skills/  ──[update copy]──▶  %USERPROFILE%\.smskills\  ──[link Junction]──▶  each agent tool
@@ -24,7 +24,7 @@
 #   -unlink <tool>  Remove junctions from a tool (link only, source safe)
 #   -d      <tool>  Alias of -unlink
 #
-#   <tool> values: claude, roo, zcode, opencode, codebuddy, codex, dsh, all
+#   <tool> values: claude, roo, zcode, opencode, codebuddy, codex, dsh, workbuddy, all
 # ========================================================
 
 [CmdletBinding()]
@@ -35,11 +35,11 @@ param(
     [switch]$update,
     [switch]$install,
     [switch]$f,
-    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "codex", "dsh", "all")]
+    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "codex", "dsh", "workbuddy", "all")]
     [string]$d,
-    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "codex", "dsh", "all")]
+    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "codex", "dsh", "workbuddy", "all")]
     [string]$unlink,
-    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "codex", "dsh", "all")]
+    [ValidateSet("claude", "roo", "zcode", "opencode", "codebuddy", "codex", "dsh", "workbuddy", "all")]
     [string]$link
 )
 
@@ -67,6 +67,7 @@ $script:tools = [ordered]@{
     codebuddy = @{ Path = Join-Path $env:USERPROFILE ".codebuddy\skills";         Name = "CodeBuddy" }
     codex     = @{ Path = Join-Path $env:USERPROFILE ".codex\skills";             Name = "Codex" }
     dsh       = @{ Path = Join-Path $env:USERPROFILE ".dsh\skills";               Name = "DeepSeek Harness" }
+    workbuddy = @{ Path = Join-Path $env:USERPROFILE ".workbuddy\skills";         Name = "WorkBuddy" }
 }
 
 # ========================================================
@@ -449,7 +450,7 @@ function Show-Help {
     Write-Host "    -unlink <tool>    Remove junctions from a tool (link only, source safe)"
     Write-Host "    -d      <tool>    Alias of -unlink"
     Write-Host ""
-    Write-Host "  Tools: claude, roo, zcode, opencode, codebuddy, codex, dsh, all"
+    Write-Host "  Tools: claude, roo, zcode, opencode, codebuddy, codex, dsh, workbuddy, all"
     Write-Host ""
     Write-Host "  Examples:" -ForegroundColor White
     Write-Host "    ./windows-skills.ps1 -install         # first setup: mirror + link all"
