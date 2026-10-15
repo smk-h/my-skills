@@ -277,7 +277,8 @@ install_all() {
 
 # ========================================================
 # 删除工具下的 skills 软链接（仅删链接，不动 ~/.smskills 源）
-# 真实目录一律跳过，避免误删用户数据
+# 只摘除指向 ~/.smskills 的链接（本脚本创建的）；
+# 指向其他来源的链接与真实目录一律跳过，避免误删
 # ========================================================
 unlink_tool() {
     local tool_key="$1"
@@ -298,9 +299,14 @@ unlink_tool() {
         name=$(basename "${item%/}")
         dst_skill="${dst_dir}/${name}"
         if [ -L "${dst_skill}" ]; then
-            rm -f "${dst_skill}"
-            success "    ${name} unlinked"
-            count=$((count + 1))
+            # 只摘除本脚本管理的、指向 ~/.smskills 的链接
+            if is_correct_symlink "${dst_skill}" "${SMSKILLS_DIR}/${name}"; then
+                rm -f "${dst_skill}"
+                success "    ${name} unlinked"
+                count=$((count + 1))
+            else
+                warning "    ${name} not managed by this repo, skipped (target: $(readlink "${dst_skill}"))"
+            fi
         else
             warning "    ${name} is a real dir, skipped (not a link)"
         fi
@@ -428,7 +434,7 @@ usage() {
   update                  把仓库 skills/ 镜像覆盖到 ${SMSKILLS_DIR}
   link   [tool] [force]   把 ${SMSKILLS_DIR}/<skill> 软链接到各 agent 工具
                           不指定工具则全部；真实目录需加 force 才替换
-  unlink [tool]           删除工具的符号链接（仅删链接，源不动）
+  unlink [tool]           删除工具的符号链接（仅删链接，源不动；只管理指向 ${SMSKILLS_DIR} 的链接）
   list   [tool]           列出已安装 skills（带 link/copy 标记）
   status                 显示链接状态矩阵
   help                   显示此帮助

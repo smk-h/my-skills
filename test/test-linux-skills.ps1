@@ -20,7 +20,9 @@ param(
     # 测试用的 docker 镜像（需含 bash）。默认 ubuntu:22.04
     [string]$Image = "ubuntu:22.04",
     # 容器内仓库挂载点
-    [string]$Mount = "/workspace"
+    [string]$Mount = "/workspace",
+    # 测试完毕后关闭 Docker Desktop（若本次是它自动拉起的则默认关闭）
+    [switch]$StopDocker
 )
 
 $ErrorActionPreference = "Stop"
@@ -43,15 +45,21 @@ $linuxSh   = "linux-skills.sh"
 # 前置检查
 # ========================================================
 
-# 1) docker 是否可用
+# 1) docker 是否可用；未运行时尝试用 start-docker.ps1 自动拉起
+$weStartedDocker = $false
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     Write-Host "❌ 未检测到 docker。请先安装并启动 Docker Desktop。" -ForegroundColor Red
     exit 2
 }
 
 try { $null = docker version 2>&1 } catch {
-    Write-Host "❌ docker 未运行或无法连接。请启动 Docker Desktop。" -ForegroundColor Red
-    exit 2
+    Write-Host "docker 未运行，尝试自动启动 Docker Desktop..." -ForegroundColor Yellow
+    & (Join-Path $scriptDir "start-docker.ps1")
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ Docker 引擎未能就绪。请手动启动 Docker Desktop。" -ForegroundColor Red
+        exit 2
+    }
+    $weStartedDocker = $true
 }
 
 # 2) 测试脚本和被测脚本是否存在
@@ -115,6 +123,12 @@ if ($exitCode -eq 0) {
     Write-Host "✅ 测试通过（exit $exitCode）" -ForegroundColor Green
 } else {
     Write-Host "❌ 测试失败（exit $exitCode）" -ForegroundColor Red
+}
+
+# 收尾: 指定 -StopDocker, 或本次由脚本自动拉起的 docker, 测试完关闭
+if ($StopDocker -or $weStartedDocker) {
+    Write-Host "关闭 Docker Desktop..." -ForegroundColor Yellow
+    & (Join-Path $scriptDir "start-docker.ps1") -Stop
 }
 
 exit $exitCode

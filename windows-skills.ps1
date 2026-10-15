@@ -21,7 +21,7 @@
 #   -install        One-shot: update + link all (good for first setup)
 #   -link   <tool>  Create junctions in a tool's skills dir (source = ~/.smskills)
 #   -f              Force: replace existing real-dir copies when linking
-#   -unlink <tool>  Remove junctions from a tool (link only, source safe)
+#   -unlink <tool>  Remove junctions from a tool (only links to ~/.smskills)
 #   -d      <tool>  Alias of -unlink
 #
 #   <tool> values: claude, roo, zcode, opencode, codebuddy, codex, dsh, workbuddy, all
@@ -285,7 +285,8 @@ function Link-Tool {
 
 # ========================================================
 # Unlink: remove junctions from a tool. Link only; source safe.
-# Real directories are skipped to avoid deleting user data.
+# Only junctions pointing to the local mirror (~/.smskills) are
+# managed here; links from other sources and real dirs are skipped.
 # ========================================================
 function Unlink-Tool {
     param([string]$ToolKey)
@@ -305,9 +306,17 @@ function Unlink-Tool {
     $count = 0
     foreach ($dir in $dirs) {
         if (Test-ReparsePoint -Path $dir.FullName) {
-            [System.IO.Directory]::Delete($dir.FullName, $false)
-            Write-Host ("    {0,-16} unlinked" -f $dir.Name) -ForegroundColor Green
-            $count++
+            $tgt = Get-LinkTarget -Path $dir.FullName
+            $expected = Join-Path $script:mirrorPath $dir.Name
+            if ($tgt -and ($tgt -eq $expected)) {
+                # 只摘除链接条目本身: Directory.Delete 不跟随重解析点, 也不动目标
+                [System.IO.Directory]::Delete($dir.FullName, $false)
+                Write-Host ("    {0,-16} unlinked" -f $dir.Name) -ForegroundColor Green
+                $count++
+            } else {
+                # 指向其他来源的链接不是本脚本创建的，不做管理
+                Write-Host ("    {0,-16} not managed by this repo, skipped (target: {1})" -f $dir.Name, $tgt) -ForegroundColor Yellow
+            }
         } else {
             Write-Host ("    {0,-16} is a real dir, skipped (not a link)" -f $dir.Name) -ForegroundColor Yellow
         }
@@ -447,7 +456,7 @@ function Show-Help {
     Write-Host "    -install          One-shot: -update + link all (good for first setup)"
     Write-Host "    -link   <tool>    Create junctions in a tool (source = ~/.smskills)"
     Write-Host "    -f                Force replace existing real-dir copies (with -link)"
-    Write-Host "    -unlink <tool>    Remove junctions from a tool (link only, source safe)"
+    Write-Host "    -unlink <tool>    Remove junctions to ~/.smskills (other links untouched)"
     Write-Host "    -d      <tool>    Alias of -unlink"
     Write-Host ""
     Write-Host "  Tools: claude, roo, zcode, opencode, codebuddy, codex, dsh, workbuddy, all"
