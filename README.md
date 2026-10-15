@@ -17,6 +17,7 @@ skills目录包含技能集合，每个子目录为一个独立技能。
 | [git-commit-spec](./skills/git-commit-spec/SKILL.md) | Git 提交规范的检查、格式化与编写指导，基于 Conventional Commits 规范 |
 | [typora-plugin-updater](./skills/typora-plugin-updater/SKILL.md) | 为 Windows 版 Typora 安装/升级 typora_plugin 插件，处理 GitHub 直连失败、UAC 提权闪退、配置覆盖等坑 |
 | [windows-disk-analysis](./skills/windows-disk-analysis/SKILL.md) | 分析 Windows 磁盘空间占用，定位大文件与大目录，标记可安全清理项并生成报告 |
+| [diagram-design](./skills/diagram-design/SKILL.md) | 以品牌化风格绘制 45 类图表（架构图/流程图/时序图/甘特图/象限图等），输出单文件 HTML+SVG，支持 drawio/Mermaid/Excalidraw 导入与 PNG/SVG 导出 |
 
 
 ## 二、安装skills
