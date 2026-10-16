@@ -101,6 +101,8 @@ npx skills add https://cnb.cool/smk.h/my-skills.git -g --all
 
 `rules/AGENTS.md` 是面向所有 AI 编程代理的工程规则（文件编码、画图技能选择等），通过 `windows-rules.ps1` 复制到各 agent 的用户级规则文件，对所有项目生效。规则文件是单文件、无镜像层：仓库改动后重跑 `-update` 即可重新分发；已存在且与仓库源不一致的目标会逐个询问是否覆盖，加 `-f` 跳过询问直接覆盖，不做备份。
 
+> **CodeBuddy 例外（用户规则，非 CODEBUDDY.md）**：官方文档明确 `CODEBUDDY.md` 只在**项目根目录**被加载，`~/.codebuddy/CODEBUDDY.md` 不是有效的全局入口；CodeBuddy 的全局入口是**用户规则**——`~/.codebuddy/rules/<规则>/RULE.mdc`（front matter 含 `description` / `alwaysApply` / `enabled`）。仓库规则全文仅约 50 行，远低于官方 500 行/条的上限，因此脚本将整份 `rules/AGENTS.md` 作为**一条 always-apply 用户规则**安装到 `~/.codebuddy/rules/agents-rules/RULE.mdc`（不切片，`AGENTS.md` 即唯一源）。旧版残留的 `~/.codebuddy/CODEBUDDY.md` 若与仓库源完全一致，会被自动清理（仅删一致的文件）。规则只在**新开会话**后生效。
+
 ```powershell
 ./windows-rules.ps1 -install         # 安装到所有工具（已存在且不一致时逐个确认）
 ./windows-rules.ps1 -install -f      # 不询问，直接强制覆盖
@@ -115,7 +117,7 @@ npx skills add https://cnb.cool/smk.h/my-skills.git -g --all
 | claude | `~/.claude/CLAUDE.md` |
 | zcode | `~/.zcode/AGENTS.md` |
 | opencode | `~/.config/opencode/AGENTS.md` |
-| codebuddy | `~/.codebuddy/CODEBUDDY.md` |
+| codebuddy | `~/.codebuddy/rules/agents-rules/RULE.mdc`（1 条用户规则，见上方说明） |
 | dsh | `~/.dsh/AGENTS.md` |
 
 > workbuddy 未查到全局规则文件的官方约定，暂不安装（skills 不受影响）。
