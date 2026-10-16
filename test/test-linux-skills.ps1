@@ -52,9 +52,19 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     exit 2
 }
 
-try { $null = docker version 2>&1 } catch {
+# 注意: docker 未运行时其报错写 stderr，在 $ErrorActionPreference='Stop' 下
+# 可能抛终止错误，故整体包 try/catch
+$engineOk = $false
+try {
+    $null = docker version --format "{{.Server.Version}}" 2>&1
+    if ($LASTEXITCODE -eq 0) { $engineOk = $true }
+} catch { }
+
+if (-not $engineOk) {
     Write-Host "docker 未运行，尝试自动启动 Docker Desktop..." -ForegroundColor Yellow
-    & (Join-Path $scriptDir "start-docker.ps1")
+    # 子进程调用: start-docker.ps1 内部会执行 docker version（未运行时写 stderr），
+    # 若同进程调用会继承本脚本的 $ErrorActionPreference='Stop' 而中断
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $scriptDir "start-docker.ps1")
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Docker 引擎未能就绪。请手动启动 Docker Desktop。" -ForegroundColor Red
         exit 2
@@ -126,9 +136,19 @@ if ($exitCode -eq 0) {
 }
 
 # 收尾: 指定 -StopDocker, 或本次由脚本自动拉起的 docker, 测试完关闭
+# 收尾失败不应改变测试结论: 子进程调用 + 临时放宽 EAP（start-docker.ps1
+# 的 docker version 探测在引擎已停时会写 stderr）
 if ($StopDocker -or $weStartedDocker) {
     Write-Host "关闭 Docker Desktop..." -ForegroundColor Yellow
-    & (Join-Path $scriptDir "start-docker.ps1") -Stop
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $scriptDir "start-docker.ps1") -Stop
+    } catch {
+        Write-Host "  (关闭 Docker 时出现异常, 已忽略: $($_.Exception.Message))" -ForegroundColor DarkYellow
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
 }
 
 exit $exitCode
