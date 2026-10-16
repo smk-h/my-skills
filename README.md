@@ -1,6 +1,6 @@
 # 苏木的 AI skills
 
-## Skills 索引
+## 一、 Skills 索引
 
 skills目录包含技能集合，每个子目录为一个独立技能。
 
@@ -97,7 +97,30 @@ npx skills add https://cnb.cool/smk.h/my-skills.git -g --all
 | `--all` | 安装全部 skills 到全部已检测到的工具 |
 | `-y, --yes` | 跳过确认提示，直接安装 |
 
-## 三、测试
+## 三、 安装 rules（全局规则）
+
+`rules/AGENTS.md` 是面向所有 AI 编程代理的工程规则（文件编码、画图技能选择等），通过 `windows-rules.ps1` 复制到各 agent 的用户级规则文件，对所有项目生效。规则文件是单文件、无镜像层：仓库改动后重跑 `-update` 即可重新分发；已存在且与仓库源不一致的目标会逐个询问是否覆盖，加 `-f` 跳过询问直接覆盖，不做备份。
+
+```powershell
+./windows-rules.ps1 -install         # 安装到所有工具（已存在且不一致时逐个确认）
+./windows-rules.ps1 -install -f      # 不询问，直接强制覆盖
+./windows-rules.ps1 -update          # 仓库改动后重新分发（同 -install）
+./windows-rules.ps1 -status          # 查看安装状态
+./windows-rules.ps1 -link claude     # 仅安装到指定工具
+./windows-rules.ps1 -unlink claude   # 移除指定工具的副本（仅删与仓库源一致的文件）
+```
+
+| 工具 | 目标文件 |
+|:-----|:---------|
+| claude | `~/.claude/CLAUDE.md` |
+| zcode | `~/.zcode/AGENTS.md` |
+| opencode | `~/.config/opencode/AGENTS.md` |
+| codebuddy | `~/.codebuddy/CODEBUDDY.md` |
+| dsh | `~/.dsh/AGENTS.md` |
+
+> workbuddy 未查到全局规则文件的官方约定，暂不安装（skills 不受影响）。
+
+## 四、测试
 
 `test/` 目录提供安装脚本的端到端测试，覆盖全部命令并校验安全性不变量（仓库源全程不被破坏、mirror 不被误删）。技能数量动态扫描，增删 skill 无需改测试代码。
 
