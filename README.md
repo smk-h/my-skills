@@ -145,12 +145,23 @@ npx skills add https://cnb.cool/smk.h/my-skills.git -g --all
 
 # Windows：测试 linux-skills.sh（通过 docker + ubuntu:22.04，无需 Git Bash）
 ./test/test-linux-skills.ps1
+
+# Windows：测试 windows-rules.ps1
+./test/test-windows-rules.ps1
+
+# Windows：测试 linux-rules.sh（通过 docker + ubuntu:22.04，无需 Git Bash）
+./test/test-linux-rules.ps1
 ```
 
 ```bash
 # Linux / macOS：直接测试 linux-skills.sh
 ./test/test-linux-skills.sh
+
+# Linux / macOS：直接测试 linux-rules.sh
+./test/test-linux-rules.sh
 ```
+
+> rules 测试把 HOME / USERPROFILE 指向临时沙箱，并以 md5 快照断言真实用户目录零触碰，因此**无需装完再恢复**，中途失败也只清理沙箱（trap EXIT 兜底）。
 
 ---
 *本文档由 markdowncli 技能辅助生成*
