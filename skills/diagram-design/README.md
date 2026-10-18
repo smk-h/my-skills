@@ -40,5 +40,13 @@ git -C /tmp/diagram-design log -1 --format="%H %ci %s"
 
 （3）更新本文件第二节表格中的提交哈希与日期。
 
+（4）以上步骤已固化为自动任务：`.cnb.yml` 中 `main` 分支的 `crontab: 0 9 * * 1`（每周一 09:00，Asia/Shanghai）调用 `.cnb/scripts/sync-diagram-design.sh`，比对上游最新提交，有更新则覆盖本目录（保留 `README.md` 与 `LICENSE`）、回写第二节表格与目录统计，并按 `ci(skills/diagram-design): 同步上游 <旧哈希> → <新哈希>` 提交推送；推送后由仓库的 `push` 流水线同步到 GitHub 镜像。
+
+本地手动执行（`--dry-run` 只报告差异，`--no-push` 只提交不推送），也可在 `main` 分支详情页点「同步 diagram-design 上游」按钮触发同一条流水线（勾选「试运行」只看差异）：
+
+```bash
+bash .cnb/scripts/sync-diagram-design.sh --dry-run
+```
+
 ---
 *本文档由 markdowncli 技能辅助生成*

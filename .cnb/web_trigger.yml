@@ -107,3 +107,24 @@ branch:
             required: false
             type: input
             default: Dockerfile
+
+  # 仅在 main 分支详情页显示：手动触发 diagram-design 技能的上游同步
+  - reg: ^main$
+    buttons:
+      - name: 同步 diagram-design 上游
+        description: 立即检查上游仓库并同步技能（默认会提交并推送，可勾选试运行只看差异）
+        event: web_trigger_sync_diagram_design
+        isDefault: false
+        inputs:
+          # 环境变量名 DRY_RUN_INPUT，由脚本识别为试运行模式
+          DRY_RUN_INPUT:
+            name: 试运行
+            description: 选「是」只输出差异清单，不改文件、不提交
+            type: select
+            required: false
+            default: "false"
+            options:
+              - name: 否（实际同步并提交推送）
+                value: "false"
+              - name: 是（只看差异）
+                value: "true"

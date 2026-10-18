@@ -4,6 +4,20 @@ include:
 - .cnb/workflows/cnb-build-image.yml
 
 main:
+  # 每周一 09:00（Asia/Shanghai）检查 diagram-design 上游仓库，有更新则同步并自动提交推送
+  "crontab: 0 9 * * 1":
+    - name: sync-diagram-design
+      stages:
+        - name: sync upstream and push
+          script: bash .cnb/scripts/sync-diagram-design.sh
+
+  # 页面「同步 diagram-design 上游」按钮触发（.cnb/web_trigger.yml），DRY_RUN_INPUT=true 时只预览差异
+  web_trigger_sync_diagram_design:
+    - name: sync-diagram-design
+      stages:
+        - name: sync upstream and push
+          script: bash .cnb/scripts/sync-diagram-design.sh
+
   push:
     - stages:
         - name: sync to sumumm'github
