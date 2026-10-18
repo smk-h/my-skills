@@ -247,6 +247,11 @@ main() {
     return 0
   fi
 
+  # hash 相同但内容有差异：本地被改过，继续走覆盖同步纠正
+  if [[ "$OLD_SHA" == "$NEW_SHA" ]]; then
+    log "提交 hash 相同（${NEW_SHA:0:8}）但本地内容与上游不一致，重新同步"
+  fi
+
   log "上游最新提交：$NEW_SHA"
   log "提交信息：$NEW_MSG（$NEW_DATE）"
 
