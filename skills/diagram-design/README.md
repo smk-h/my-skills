@@ -11,10 +11,10 @@
 | 项目 | 内容 |
 |:-----|:-----|
 | 原仓库 | https://github.com/cathrynlavery/diagram-design |
-| 拉取提交 | `d97c5c7477e54cee17cfa6459190610da0643a05` |
-| 提交信息 | chore(release): bump plugin manifests to 2.6.99 |
-| 提交日期 | 2026-10-14 |
-| 拉取日期 | 2026-10-15 |
+| 拉取提交 | `550fd66edff058bc73056c3416b76d69cfe865ba` |
+| 提交信息 | chore(release): bump plugin manifests to 2.6.110 |
+| 提交日期 | 2026-10-16 |
+| 拉取日期 | 2026-10-18 |
 | 技能版本 | 2.6（见 `SKILL.md` 的 metadata.version） |
 | 许可证 | MIT（见本目录 [LICENSE](./LICENSE)） |
 
