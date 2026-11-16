@@ -11,10 +11,10 @@
 | 项目 | 内容 |
 |:-----|:-----|
 | 原仓库 | https://github.com/cathrynlavery/diagram-design |
-| 拉取提交 | `a928d8a421080b8d197789a16588f2d1ce06dee7` |
-| 提交信息 | chore(release): bump plugin manifests to 2.6.147 |
-| 提交日期 | 2026-11-08 |
-| 拉取日期 | 2026-11-09 |
+| 拉取提交 | `f6db0decea96de66b901331a0f79a8d4b147ebae` |
+| 提交信息 | chore(release): bump plugin manifests to 2.6.164 |
+| 提交日期 | 2026-11-12 |
+| 拉取日期 | 2026-11-16 |
 | 技能版本 | 2.6（见 `SKILL.md` 的 metadata.version） |
 | 许可证 | MIT（见本目录 [LICENSE](./LICENSE)） |
 
@@ -23,8 +23,8 @@
 ## 三、 目录结构
 
 - `SKILL.md`：技能入口说明
-- `assets/`：220 个图表模板 HTML
-- `references/`：63 个图表类型参考文档
+- `assets/`：239 个图表模板 HTML
+- `references/`：69 个图表类型参考文档
 - `scripts/`：辅助脚本
 
 ## 四、 更新方法
